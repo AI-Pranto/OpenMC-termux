@@ -5,3 +5,6 @@ Running openmc on Android phone
 - git
 - cmake
 - clang
+- vim
+- libhdf5
+- libhdf5-static
