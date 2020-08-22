@@ -18,6 +18,7 @@ cd
 wget https://anl.box.com/shared/static/teaup95cqv8s9nn56hfn7ku8mmelr95p.xz
 tar -xvf teaup95cqv8s9nn56hfn7ku8mmelr95p.xz
 echo 'export OPENMC_CROSS_SECTIONS=/data/data/com.termux/files/home/nndc_hdf5/cross_sections.xml' >> $PREFIX/etc/bash.bashrc
+source $PREFIX/etc/bash.bashrc
 rm -r teaup95cqv8s9nn56hfn7ku8mmelr95p.xz
 cd OpenMC-termux
 openmc
