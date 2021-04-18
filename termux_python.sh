@@ -1,18 +1,22 @@
+pkg update && pkg upgrade -y
+
+wget -P $HOME https://its-pointless.github.io/setup-pointless-repo.sh
+bash $HOME/setup-pointless-repo.sh
+
 pkg install build-essential \
 	cmake \
 	clang \
 	wget \
 	libhdf5-static \
 	vim \
-	python -y
-
-wget -P $HOME https://its-pointless.github.io/setup-pointless-repo.sh
-bash $HOME/setup-pointless-repo.sh
+	python \
+	numpy \
+	scipy \
+	libxml2 \
+	libxslt \
+	libjpeg-turbo -y
 
 pip install --upgrade pip
-
-# Numpy, Scipy
-pkg install numpy scipy -y
 
 # pandas
 export CFLAGS="-Wno-deprecated-declarations -Wno-unreachable-code" && pip install pandas
@@ -25,9 +29,12 @@ sed 's@#enable_lto = True@enable_lto = False@g' setup.cfg.template > setup.cfg
 pip install .
 
 # lxml
-pkg install libxml2 libxslt -y
 pip install lxml \
-			h5py
+	h5py \
+	wheel
+
+# pillow
+LDFLAGS="-L/system/lib/" CFLAGS="-I/data/data/com.termux/files/usr/include/" pip install Pillow
 
 mkdir -p $HOME/opt/OpenMC/build && cd ~/opt/OpenMC
 git clone --recurse-submodules https://github.com/openmc-dev/openmc.git
