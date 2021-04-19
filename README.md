@@ -1,5 +1,5 @@
 # OpenMC-termux
-Running openmc on Android phone
+Script for installing OpenMC on Android phone
 
 # Dependency List
 - git
@@ -12,10 +12,9 @@ Running openmc on Android phone
 # Installation
 Download `Termux` from **Google Play Store**
 ```
-pkg update
+pkg update && pkg upgrade -y
 pkg install git
 git clone https://github.com/AI-Pranto/OpenMC-termux.git
 cd OpenMC-termux
-chmod +x termux.sh
-./termux.sh
+bash termux.sh
 ```
