@@ -6,17 +6,25 @@ bash $HOME/setup-pointless-repo.sh
 pkg install build-essential \
 	cmake \
 	clang \
+	gcc-10 \
+	libgfortran \
 	wget \
 	libhdf5-static \
 	vim \
 	python \
-	numpy \
-	scipy \
 	libxml2 \
 	libxslt \
 	libjpeg-turbo -y
 
+# setup gcc
+setupgcc-10
+
 pip install --upgrade pip
+
+# numpy and scipy install
+pip install wheel \
+	scipy \
+	numpy
 
 # pandas
 export CFLAGS="-Wno-deprecated-declarations -Wno-unreachable-code" && pip install pandas
@@ -30,8 +38,7 @@ pip install .
 
 # lxml
 pip install lxml \
-	h5py \
-	wheel
+	h5py
 
 # pillow
 LDFLAGS="-L/system/lib/" CFLAGS="-I/data/data/com.termux/files/usr/include/" pip install Pillow
@@ -48,13 +55,13 @@ echo 'export LD_LIBRARY_PATH=$HOME/opt/OpenMC/lib:$LD_LIBRARY_PATH' >> $PREFIX/e
 
 # Download HDF5 data
 if [[ -z "${OPENMC_CROSS_SECTIONS}" ]]; then
-	wget -c -P $HOME https://anl.box.com/shared/static/teaup95cqv8s9nn56hfn7ku8mmelr95p.xz
-	tar -xvf $HOME/teaup95cqv8s9nn56hfn7ku8mmelr95p.xz -C $HOME
+	wget -c -P $HOME https://anl.box.com/shared/static/teaup95cqv8s9nn56hfn7ku8mmelr95p.xz -O nndc
+	tar -xvf $HOME/nndc -C $HOME
 fi
 
 echo 'export OPENMC_CROSS_SECTIONS=$HOME/nndc_hdf5/cross_sections.xml' >> $PREFIX/etc/bash.bashrc
 source $PREFIX/etc/bash.bashrc
-rm -rf $HOME/teaup95cqv8s9nn56hfn7ku8mmelr95p.xz
+rm -rf $HOME/nndc
 
 # python API
 cd ~/opt/OpenMC/openmc
