@@ -60,4 +60,5 @@ rm -rf $HOME/teaup95cqv8s9nn56hfn7ku8mmelr95p.xz
 cd ~/opt/OpenMC/openmc
 pip install .
 
-cd ~/OpenMC-termux && openmc
+# Run pincell depletion
+cd ~/OpenMC-termux/pincell_depletion/run_depletion.py && python run_depletion.py
