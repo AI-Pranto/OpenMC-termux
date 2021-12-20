@@ -2,15 +2,15 @@
 Script for installing OpenMC on Android phone
 
 # Dependency List
-- git
-- cmake
 - clang
-- vim
-- libhdf5
+- cmake
+- git
 - libhdf5-static
+- vim
+- wget
 
 # Installation
-Download `Termux` from **Google Play Store**
+Download the latest version of `Termux` from [F-Droid](https://f-droid.org/en/packages/com.termux/)
 ```
 pkg update && pkg upgrade -y
 pkg install git

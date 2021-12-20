@@ -4,7 +4,7 @@ clear
 pkg update && pkg upgrade -y
 
 wget -P $HOME https://its-pointless.github.io/setup-pointless-repo.sh
-bash $HOME/setup-pointless-repo.sh
+bash $HOME/setup-pointless-repo.sh -y
 
 pkg install build-essential \
 	clang \
@@ -15,7 +15,7 @@ pkg install build-essential \
 	libzmq \
 	gcc-10 \
 	git \
-	libgfortran \
+	libgfortran5-10 \
 	libgmp \
 	libmpc \
 	libmpfr \
@@ -23,6 +23,7 @@ pkg install build-essential \
 	libxml2 \
 	libxslt \
 	libjpeg-turbo \
+	openblas \
 	pkg-config \
 	python \
 	vim \
@@ -33,47 +34,55 @@ pkg install build-essential \
 setupgcc-10
 
 pip install --upgrade pip
-pkg install numpy \
-			scipy
 
-# numpy, scipy, cython, h5py, lxml, ipython install
+# Install numpy
+LDFLAGS=" -lm -lcompiler_rt" pip install numpy
+
+# Install Cython, ipython, lxml, h5py
 pip install cython \
+			h5py \
 			ipython \
 			lxml \
-			h5py \
-			numpy \
-			scipy
+			pybind11 \
+			pythran \
+			uncertainties
 
-# pandas
-export CFLAGS="-Wno-deprecated-declarations -Wno-unreachable-code" && pip install pandas
+# Install pandas
 LDFLAGS=" -lm -lcompiler_rt" pip install pandas
+
+# pillow
+LDFLAGS="-L/system/lib64/" CFLAGS="-I/data/data/com.termux/files/usr/include/" pip install Pillow
 
 # matplotlib
 CFLAGS=" -I/data/data/com.termux/files/usr/include/freetype2" CPPFLAGS=$CFLAGS LDFLAGS=" -lm -lcompiler_rt" pip install matplotlib
 
-# pillow
-LDFLAGS="-L/system/lib/" CFLAGS="-I/data/data/com.termux/files/usr/include/" pip install Pillow
+# Install scipy
+echo 'export BLAS=/data/data/com.termux/files/usr/lib/libblas.so' >> $PREFIX/etc/bash.bashrc
+echo 'export LAPACK=/data/data/com.termux/files/usr/lib/liblapack.so' >> $PREFIX/etc/bash.bashrc
+LDFLAGS=" -lm -lcompiler_rt" pip install scipy --no-build-isolation
 
 # openmc install
 mkdir -p $HOME/opt/OpenMC/build && cd ~/opt/OpenMC
-git clone --recurse-submodules https://github.com/openmc-dev/openmc.git
-cd build
+git clone --recurse-submodules https://github.com/openmc-dev/openmc.git && cd build
 cmake -DCMAKE_INSTALL_PREFIX=$HOME/opt/OpenMC ../openmc
 make -j${nproc --all} install
 
-# Env set for OpenMC
+# Env variable set for OpenMC
 echo 'export PATH=$HOME/opt/OpenMC/bin:$PATH' >> $PREFIX/etc/bash.bashrc
 echo 'export LD_LIBRARY_PATH=$HOME/opt/OpenMC/lib:$LD_LIBRARY_PATH' >> $PREFIX/etc/bash.bashrc
 
 # Download HDF5 data
-wget -q -O - https://anl.box.com/shared/static/teaup95cqv8s9nn56hfn7ku8mmelr95p.xz | tar -C $HOME -xJ
+if [[ -z "${OPENMC_CROSS_SECTIONS}" ]]; then
+	wget -q -O - https://anl.box.com/shared/static/teaup95cqv8s9nn56hfn7ku8mmelr95p.xz | tar -C $HOME -xJ
+fi
 
-echo 'export OPENMC_CROSS_SECTIONS=$HOME/nndc_hdf5/cross_sections.xml' >> $PREFIX/etc/bash.bashrc
-source $PREFIX/etc/bash.bashrc
+# Env variable set for OpenMC
+echo 'export PATH=$HOME/opt/OpenMC/bin:$PATH' >> $PREFIX/etc/bash.bashrc
+echo 'export LD_LIBRARY_PATH=$HOME/opt/OpenMC/lib:$LD_LIBRARY_PATH' >> $PREFIX/etc/bash.bashrc
+echo 'export OPENMC_CROSS_SECTIONS=$HOME/nndc_hdf5/cross_sections.xml' >> $PREFIX/etc/bash.bashrc && source $PREFIX/etc/bash.bashrc
 
 # python API
-cd ~/opt/OpenMC/openmc
-pip install .
+cd ~/opt/OpenMC/openmc && pip install .
 
 # Run pincell depletion
 cd ~/OpenMC-termux/pincell_depletion/run_depletion.py && python run_depletion.py
